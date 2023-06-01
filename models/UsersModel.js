@@ -24,6 +24,13 @@ const Users = db.define(
     refresh_token: {
       type: DataTypes.TEXT,
     },
+    categoryId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "book_category",
+        key: "id",
+      }
+    }
   },
   {
     freezeTableName: true,
