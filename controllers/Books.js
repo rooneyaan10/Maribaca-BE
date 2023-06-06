@@ -1,22 +1,25 @@
 import Books from "../models/BooksModel.js";
+import { Op } from "sequelize";
 
-export const getBooks = async (req, res) => {
-  try {
-    const books = await Books.findAll({
-      attributes: [
-        "id",
-        "link",
-        "cover",
-        "title",
-        "author",
-        "publisher",
-        "descriptions",
-        "page",
-        "categoryId",
+export const searchBooks = async (req, res) => {
+  const search = req.query.search_query || "";
+  const result = await Books.findAll({
+    where: {
+      [Op.or]: [
+        {
+          title: {
+            [Op.like]: "%" + search + "%",
+          },
+        },
+        {
+          author: {
+            [Op.like]: "%" + search + "%",
+          },
+        },
       ],
-    });
-    res.json(books);
-  } catch (error) {
-    console.log(error);
-  }
+    },
+  });
+  res.json({
+    result: result,
+  });
 };
