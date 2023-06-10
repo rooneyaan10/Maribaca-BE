@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
+import Books from "./BooksModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -7,7 +8,7 @@ const ReadData = db.define(
   "read_data",
   {
     status: {
-      type: DataTypes.ENUM("Ingin Dibaca", "Sedang Dibaca", "Sudah Dibaca"),
+      type: DataTypes.ENUM("Sedang Dibaca", "Sudah Dibaca"),
     },
     lastPage: {
       type: DataTypes.INTEGER,
@@ -15,11 +16,9 @@ const ReadData = db.define(
     },
     startReading: {
       type: DataTypes.DATE,
-      allowNull: false,
     },
     doneReading: {
       type: DataTypes.DATE,
-      allowNull: true,
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -42,5 +41,7 @@ const ReadData = db.define(
     freezeTableName: true,
   }
 );
+
+ReadData.belongsTo(Books, { foreignKey: "bookId" });
 
 export default ReadData;
