@@ -23,7 +23,7 @@ export const refreshToken = async (req, res) => {
           { userId, username, email, id: user[0].id },
           process.env.ACCESS_TOKEN_SECRET,
           {
-            expiresIn: "15s",
+            expiresIn: "24h",
           }
         );
         res.json({ accessToken });
