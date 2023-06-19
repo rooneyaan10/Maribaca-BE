@@ -17,6 +17,14 @@ try {
   console.error(error);
 }
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    error: false,
+    status: 200,
+    message: "test",
+  });
+});
+
 app.use(cors({ credentials: true, origin: "http://localhost:8081" }));
 app.use(cookieParser());
 app.use(express.json());
