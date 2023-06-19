@@ -36,7 +36,17 @@ export const getDoneRead = async (req, res) => {
       include: [
         {
           model: Books,
-          attributes: ["id", "title", "author", "cover", "page"],
+          attributes: [
+            "id",
+            "title",
+            "author",
+            "cover",
+            "page",
+            "publisher",
+            "descriptions",
+            "categoryId",
+            "link",
+          ],
         },
       ],
       attributes: ["status", "lastPage", "startReading", "doneReading"],
@@ -74,5 +84,46 @@ export const startRead = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.json({ msg: "gagal" });
+  }
+};
+
+export const updatePage = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const bookId = req.params.bookId;
+    const { lastPage } = req.body;
+
+    const readData = await ReadData.findOne({
+      where: {
+        userId: userId,
+        bookId: bookId,
+        status: "Sedang Dibaca",
+      },
+    });
+
+    if (!readData) {
+      return res.status(404).json({ msg: "Data tidak ditemukan" });
+    }
+
+    const book = await Books.findByPk(bookId);
+    if (!book) {
+      return res.status(404).json({ msg: "Buku tidak ditemukan" });
+    }
+
+    if (lastPage >= book.page) {
+      await readData.update({
+        lastPage: lastPage,
+        status: "Sudah Dibaca",
+      });
+    } else {
+      await readData.update({
+        lastPage: lastPage,
+      });
+    }
+
+    res.json({ msg: "Berhasil memperbarui halaman terakhir yang dibaca" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Server Error" });
   }
 };

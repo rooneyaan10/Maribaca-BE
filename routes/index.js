@@ -8,6 +8,7 @@ import {
   getCurrentlyRead,
   getDoneRead,
   startRead,
+  updatePage,
 } from "../controllers/ReadData.js"; // Tambahkan ini
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.delete("/logout", Logout);
 router.get("/searchbooks", searchBooks);
 router.get("/users/:userId/currentlyread", verifyToken, getCurrentlyRead); // Tambahkan ini
 router.get("/users/:userId/doneread", verifyToken, getDoneRead);
-router.post("/users/:userId/:bookId/startread", verifyToken, startRead);
+router.post("/users/:userId/books/:bookId/startread", verifyToken, startRead);
+router.put("/users/:userId/books/:bookId/updatepage", verifyToken, updatePage);
 
 export default router;
