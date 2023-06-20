@@ -17,7 +17,10 @@ const ReadData = db.define(
     startReading: {
       type: DataTypes.DATE,
     },
-    doneReading: {
+    target: {
+      type: DataTypes.DATE,
+    },
+    lastRead: {
       type: DataTypes.DATE,
     },
     userId: {

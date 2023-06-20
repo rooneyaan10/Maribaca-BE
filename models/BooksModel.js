@@ -32,6 +32,11 @@ const Books = db.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+    },
     categoryId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -43,6 +48,7 @@ const Books = db.define(
   },
   {
     freezeTableName: true,
+    timestamps: true,
   }
 );
 

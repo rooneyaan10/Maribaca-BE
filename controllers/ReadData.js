@@ -15,7 +15,7 @@ export const getCurrentlyRead = async (req, res) => {
           attributes: ["id", "title", "author", "cover", "page"],
         },
       ],
-      attributes: ["status", "lastPage", "startReading", "doneReading"],
+      attributes: ["status", "lastPage", "startReading", "lastRead", "target"],
     });
 
     res.json(readData);
@@ -46,10 +46,20 @@ export const getDoneRead = async (req, res) => {
             "descriptions",
             "categoryId",
             "link",
+            "createdAt",
+            "updatedAt",
           ],
         },
       ],
-      attributes: ["status", "lastPage", "startReading", "doneReading"],
+      attributes: [
+        "status",
+        "lastPage",
+        "startReading",
+        "target",
+        "lastRead",
+        "createdAt",
+        "updatedAt",
+      ],
     });
 
     res.json(readData);
@@ -63,19 +73,20 @@ export const startRead = async (req, res) => {
   try {
     const userId = req.params.userId;
     const bookId = req.params.bookId;
-    const { doneReading } = req.body;
+    const { target } = req.body;
 
     const currentDate = new Date();
-    const doneReadingDate = new Date(doneReading);
-    doneReadingDate.setHours(currentDate.getHours());
-    doneReadingDate.setMinutes(currentDate.getMinutes());
-    doneReadingDate.setSeconds(currentDate.getSeconds());
+    const targetReadingDate = new Date(target);
+    targetReadingDate.setHours(currentDate.getHours());
+    targetReadingDate.setMinutes(currentDate.getMinutes());
+    targetReadingDate.setSeconds(currentDate.getSeconds());
 
     await ReadData.create({
       status: "Sedang Dibaca",
       lastPage: 1,
       startReading: currentDate,
-      doneReading: doneReadingDate,
+      target: target,
+      lastRead: currentDate,
       userId: userId,
       bookId: bookId,
     });
@@ -114,10 +125,12 @@ export const updatePage = async (req, res) => {
       await readData.update({
         lastPage: lastPage,
         status: "Sudah Dibaca",
+        lastRead: new Date(), // Tambahkan perintah ini
       });
     } else {
       await readData.update({
         lastPage: lastPage,
+        lastRead: new Date(), // Tambahkan perintah ini
       });
     }
 
