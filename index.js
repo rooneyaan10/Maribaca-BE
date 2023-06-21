@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import db from "./config/Database.js";
 import router from "./routes/index.js";
-import Books from "./models/BooksModel.js";
+// import Books from "./models/BooksModel.js";
 
 dotenv.config();
 const app = express();
@@ -12,7 +12,7 @@ const app = express();
 try {
   await db.authenticate();
   console.log("Database Connected");
-  await Books.sync();
+  // await Books.sync();
 } catch (error) {
   console.error(error);
 }
@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use(cors({ credentials: true, origin: "http://localhost:8081" }));
+app.use(cors({ credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(router);

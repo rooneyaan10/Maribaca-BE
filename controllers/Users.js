@@ -110,3 +110,57 @@ export const Logout = async (req, res) => {
   res.clearCookie("refreshToken");
   return res.sendStatus(200);
 };
+
+export const updateUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const {
+      profilePic,
+      username,
+      email,
+      currentPassword,
+      newPassword,
+      confirmNewPassword,
+    } = req.body;
+
+    const user = await Users.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User tidak ditemukan" });
+    }
+
+    if (profilePic) {
+      await user.update({ profilePic });
+    }
+
+    if (username) {
+      await user.update({ username });
+    }
+
+    if (email) {
+      await user.update({ email });
+    }
+
+    if (currentPassword && newPassword && confirmNewPassword) {
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ msg: "Password saat ini salah" });
+      }
+
+      if (newPassword !== confirmNewPassword) {
+        return res
+          .status(400)
+          .json({ msg: "Password baru dan konfirmasi tidak cocok" });
+      }
+
+      const salt = await bcrypt.genSalt();
+      const hashPassword = await bcrypt.hash(newPassword, salt);
+
+      await user.update({ password: hashPassword });
+    }
+
+    res.json({ msg: "Berhasil mengubah data pengguna" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};

@@ -46,8 +46,6 @@ export const getDoneRead = async (req, res) => {
             "descriptions",
             "categoryId",
             "link",
-            "createdAt",
-            "updatedAt",
           ],
         },
       ],

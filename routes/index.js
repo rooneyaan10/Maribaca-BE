@@ -1,6 +1,12 @@
 // routes/index.js
 import express from "express";
-import { getUsers, Register, Login, Logout } from "../controllers/Users.js";
+import {
+  getUsers,
+  Register,
+  Login,
+  Logout,
+  updateUser,
+} from "../controllers/Users.js";
 import { verifyToken } from "../middleware/VerifyToken.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 import { searchBooks } from "../controllers/Books.js";
@@ -23,5 +29,6 @@ router.get("/users/:userId/currentlyread", verifyToken, getCurrentlyRead); // Ta
 router.get("/users/:userId/doneread", verifyToken, getDoneRead);
 router.post("/users/:userId/books/:bookId/startread", verifyToken, startRead);
 router.put("/users/:userId/books/:bookId/updatepage", verifyToken, updatePage);
+router.put("/users/:userId/updateuser", verifyToken, updateUser);
 
 export default router;
