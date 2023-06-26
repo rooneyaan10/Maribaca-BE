@@ -1,4 +1,3 @@
-// routes/index.js
 import express from "express";
 import {
   getUsers,
@@ -15,7 +14,8 @@ import {
   getDoneRead,
   startRead,
   updatePage,
-} from "../controllers/ReadData.js"; // Tambahkan ini
+  getTotalReadBooks, // Tambahkan ini
+} from "../controllers/ReadData.js";
 
 const router = express.Router();
 
@@ -25,10 +25,11 @@ router.post("/login", Login);
 router.get("/token", refreshToken);
 router.delete("/logout", Logout);
 router.get("/searchbooks", searchBooks);
-router.get("/users/:userId/currentlyread", verifyToken, getCurrentlyRead); // Tambahkan ini
+router.get("/users/:userId/currentlyread", verifyToken, getCurrentlyRead);
 router.get("/users/:userId/doneread", verifyToken, getDoneRead);
 router.post("/users/:userId/books/:bookId/startread", verifyToken, startRead);
 router.put("/users/:userId/books/:bookId/updatepage", verifyToken, updatePage);
 router.put("/users/:userId/updateuser", verifyToken, updateUser);
+router.get("/users/:userId/total-read-books", verifyToken, getTotalReadBooks);
 
 export default router;

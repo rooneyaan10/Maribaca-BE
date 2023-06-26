@@ -119,20 +119,44 @@ export const updatePage = async (req, res) => {
       return res.status(404).json({ msg: "Buku tidak ditemukan" });
     }
 
-    if (lastPage >= book.page) {
+    if (parseInt(lastPage) > parseInt(book.page)) {
+      return res
+        .status(400)
+        .json({ msg: "Jumlah halaman melebihi jumlah halaman buku" });
+    }
+
+    if (parseInt(lastPage) === parseInt(book.page)) {
       await readData.update({
         lastPage: lastPage,
         status: "Sudah Dibaca",
-        lastRead: new Date(), // Tambahkan perintah ini
+        lastRead: new Date(),
       });
     } else {
       await readData.update({
         lastPage: lastPage,
-        lastRead: new Date(), // Tambahkan perintah ini
+        lastRead: new Date(),
       });
     }
 
     res.json({ msg: "Berhasil memperbarui halaman terakhir yang dibaca" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+export const getTotalReadBooks = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const totalReadBooks = await ReadData.count({
+      where: {
+        userId: userId,
+        status: "Sudah Dibaca",
+      },
+    });
+
+    res.json({ totalReadBooks });
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: "Server Error" });
