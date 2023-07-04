@@ -23,3 +23,13 @@ export const searchBooks = async (req, res) => {
     result: result,
   });
 };
+
+export const getTotalBooks = async (req, res) => {
+  try {
+    const totalBooks = await Books.count();
+    res.json({ totalBooks: totalBooks });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};

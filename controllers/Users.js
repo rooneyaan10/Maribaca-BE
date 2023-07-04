@@ -1,16 +1,34 @@
 import Users from "../models/UsersModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
 
-export const getUsers = async (req, res) => {
-  try {
-    const users = await Users.findAll({
-      attributes: ["id", "username", "email", "password", "profilePic"],
-    });
-    res.json(users);
-  } catch (error) {
-    console.log(error);
-  }
+export const searchUsers = async (req, res) => {
+  const search = req.query.search_query || "";
+  const result = await Users.findAll({
+    where: {
+      [Op.or]: [
+        {
+          id: {
+            [Op.like]: "%" + search + "%",
+          },
+        },
+        {
+          username: {
+            [Op.like]: "%" + search + "%",
+          },
+        },
+        {
+          email: {
+            [Op.like]: "%" + search + "%",
+          },
+        },
+      ],
+    },
+  });
+  res.json({
+    result: result,
+  });
 };
 
 export const Register = async (req, res) => {
@@ -159,6 +177,16 @@ export const updateUser = async (req, res) => {
     }
 
     res.json({ msg: "Berhasil mengubah data pengguna" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+export const getTotalUsers = async (req, res) => {
+  try {
+    const totalUsers = await Users.count();
+    res.json({ totalUsers: totalUsers });
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: "Server Error" });
