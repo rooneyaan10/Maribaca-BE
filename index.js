@@ -1,4 +1,5 @@
 import express from "express";
+import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -28,6 +29,8 @@ app.get("/", (req, res) => {
 app.use(cors({ credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
+app.use(fileUpload());
+app.use(express.static("public"));
 app.use(router);
 
 app.listen(5000, () => console.log("Server running at port 5000"));

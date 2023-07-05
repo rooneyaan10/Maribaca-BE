@@ -32,7 +32,7 @@ export const searchUsers = async (req, res) => {
 };
 
 export const Register = async (req, res) => {
-  const { username, email, password, confPassword } = req.body;
+  const { username, email, password, confPassword, role } = req.body;
   // Memeriksa apakah username sudah ada dalam database
   const existingUser = await Users.findOne({ where: { username: username } });
   if (existingUser) {
@@ -55,6 +55,7 @@ export const Register = async (req, res) => {
       username: username,
       email: email,
       password: hashPassword,
+      role: role,
     });
     res.json({ msg: "Register Berhasil" });
   } catch (error) {
@@ -187,6 +188,21 @@ export const getTotalUsers = async (req, res) => {
   try {
     const totalUsers = await Users.count();
     res.json({ totalUsers: totalUsers });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await Users.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User tidak ditemukan" });
+    }
+    await user.destroy();
+    res.json({ msg: "Akun berhasil dihapus" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: "Server Error" });

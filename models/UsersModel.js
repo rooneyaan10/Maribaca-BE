@@ -24,13 +24,17 @@ const Users = db.define(
     refresh_token: {
       type: DataTypes.TEXT,
     },
+    role: {
+      type: DataTypes.ENUM("user", "admin"),
+      defaultValue: "user",
+    },
     categoryId: {
       type: DataTypes.INTEGER,
       references: {
         model: "book_category",
         key: "id",
-      }
-    }
+      },
+    },
   },
   {
     freezeTableName: true,

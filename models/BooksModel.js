@@ -11,6 +11,9 @@ const Books = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    image: {
+      type: DataTypes.STRING,
+    },
     cover: {
       type: DataTypes.STRING,
     },
