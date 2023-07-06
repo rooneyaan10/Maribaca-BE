@@ -7,21 +7,28 @@ export const searchUsers = async (req, res) => {
   const search = req.query.search_query || "";
   const result = await Users.findAll({
     where: {
-      [Op.or]: [
+      [Op.and]: [
         {
-          id: {
-            [Op.like]: "%" + search + "%",
-          },
+          [Op.or]: [
+            {
+              id: {
+                [Op.like]: "%" + search + "%",
+              },
+            },
+            {
+              username: {
+                [Op.like]: "%" + search + "%",
+              },
+            },
+            {
+              email: {
+                [Op.like]: "%" + search + "%",
+              },
+            },
+          ],
         },
         {
-          username: {
-            [Op.like]: "%" + search + "%",
-          },
-        },
-        {
-          email: {
-            [Op.like]: "%" + search + "%",
-          },
+          role: "user",
         },
       ],
     },
@@ -108,6 +115,59 @@ export const Login = async (req, res) => {
   }
 };
 
+export const AdminLogin = async (req, res) => {
+  try {
+    const user = await Users.findOne({
+      where: {
+        email: req.body.email,
+        role: "admin",
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ msg: "Anda bukan admin!" });
+    }
+
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if (!match) {
+      return res.status(400).json({ msg: "Invalid Credentials" });
+    }
+
+    const userId = user.id;
+    const username = user.username;
+    const email = user.email;
+    const accessToken = jwt.sign(
+      { userId, username, email },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+    const refreshToken = jwt.sign(
+      { userId, username, email },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+    await Users.update(
+      { refresh_token: refreshToken },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.json({ accessToken });
+  } catch (error) {
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
+
 export const Logout = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) return res.sendStatus(204);
@@ -186,7 +246,11 @@ export const updateUser = async (req, res) => {
 
 export const getTotalUsers = async (req, res) => {
   try {
-    const totalUsers = await Users.count();
+    const totalUsers = await Users.count({
+      where: {
+        role: "user",
+      },
+    });
     res.json({ totalUsers: totalUsers });
   } catch (error) {
     console.log(error);

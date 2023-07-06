@@ -3,6 +3,7 @@ import {
   searchUsers,
   Register,
   Login,
+  AdminLogin,
   Logout,
   updateUser,
   getTotalUsers,
@@ -30,6 +31,7 @@ router.get("/users", searchUsers);
 router.get("/totalusers", getTotalUsers);
 router.post("/register", Register);
 router.post("/login", Login);
+router.post("/adminlogin", AdminLogin);
 router.get("/token", refreshToken);
 router.delete("/logout", Logout);
 router.get("/searchbooks", searchBooks);
