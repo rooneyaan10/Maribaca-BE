@@ -49,36 +49,56 @@ export const getProductById = async (req, res) => {
   }
 };
 
-export const addBooks = (req, res) => {
-  if (req.files === null)
-    return res.status(400).json({ msg: "No File Uploaded" });
+export const addBook = async (req, res) => {
   const title = req.body.title;
-  const file = req.files.file;
-  const fileSize = file.data.length;
-  const ext = path.extname(file.name);
-  const fileName = file.md5 + ext;
-  const host = "http://10.0.2.2:5000";
-  const cover = `${host}/images/${fileName}`;
-  const allowedType = [".png", ".jpg", ".jpeg"];
+  const file = req.files ? req.files.file : null;
   const link = req.body.link;
   const author = req.body.author;
   const publisher = req.body.publisher;
   const descriptions = req.body.descriptions;
   const page = req.body.page;
   const categoryId = req.body.categoryId;
+  const host = "http://10.0.2.2:5000";
+  const defaultCover = `${host}/images/defaultCover.jpg`;
 
-  if (!allowedType.includes(ext.toLowerCase()))
-    return res.status(422).json({ msg: "Invalid Images" });
-  if (fileSize > 5000000)
-    return res.status(422).json({ msg: "Image must be less than 5 MB" });
+  if (file) {
+    const fileSize = file.data.length;
+    const ext = path.extname(file.name);
+    const fileName = file.md5 + ext;
+    const allowedType = [".png", ".jpg", ".jpeg"];
+    const cover = `${host}/images/${fileName}`;
 
-  file.mv(`./public/images/${fileName}`, async (err) => {
-    if (err) return res.status(500).json({ msg: err.message });
+    if (!allowedType.includes(ext.toLowerCase()))
+      return res.status(422).json({ msg: "Invalid Images" });
+    if (fileSize > 5000000)
+      return res.status(422).json({ msg: "Image must be less than 5 MB" });
+
+    file.mv(`./public/images/${fileName}`, async (err) => {
+      if (err) return res.status(500).json({ msg: err.message });
+      try {
+        await Books.create({
+          title: title,
+          image: fileName,
+          cover: cover,
+          link: link,
+          author: author,
+          publisher: publisher,
+          descriptions: descriptions,
+          page: page,
+          categoryId: categoryId,
+        });
+        res.status(201).json({ msg: "Berhasil Menambah Buku" });
+      } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ msg: "Server Error" });
+      }
+    });
+  } else {
     try {
       await Books.create({
         title: title,
-        image: fileName,
-        cover: cover,
+        image: "defaultCover.jpg",
+        cover: defaultCover,
         link: link,
         author: author,
         publisher: publisher,
@@ -89,6 +109,22 @@ export const addBooks = (req, res) => {
       res.status(201).json({ msg: "Berhasil Menambah Buku" });
     } catch (error) {
       console.log(error.message);
+      res.status(500).json({ msg: "Server Error" });
     }
-  });
+  }
+};
+
+export const deleteBook = async (req, res) => {
+  try {
+    const bookId = req.params.bookId;
+    const user = await Books.findByPk(bookId);
+    if (!user) {
+      return res.status(404).json({ msg: "Buku tidak ditemukan" });
+    }
+    await user.destroy();
+    res.json({ msg: "Akun berhasil dihapus" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Server Error" });
+  }
 };
