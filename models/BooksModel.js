@@ -7,10 +7,6 @@ const { DataTypes } = Sequelize;
 const Books = db.define(
   "books",
   {
-    link: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     image: {
       type: DataTypes.STRING,
     },

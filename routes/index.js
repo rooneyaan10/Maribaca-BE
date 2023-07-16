@@ -24,6 +24,7 @@ import {
   updatePage,
   getTotalReadBooks,
 } from "../controllers/ReadData.js";
+import { getRecommendations } from "../controllers/Recommendations.js";
 
 const router = express.Router();
 
@@ -45,5 +46,6 @@ router.put("/users/:userId/updateuser", updateUser);
 router.get("/users/:userId/total-read-books", verifyToken, getTotalReadBooks);
 router.delete("/users/:userId/deleteaccount", deleteAccount);
 router.delete("/books/:bookId/deletebook", deleteBook);
+router.get("/users/:userId/recommendations", verifyToken, getRecommendations);
 
 export default router;

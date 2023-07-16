@@ -45,7 +45,6 @@ export const getDoneRead = async (req, res) => {
             "publisher",
             "descriptions",
             "categoryId",
-            "link",
           ],
         },
       ],

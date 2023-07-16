@@ -52,13 +52,12 @@ export const getProductById = async (req, res) => {
 export const addBook = async (req, res) => {
   const title = req.body.title;
   const file = req.files ? req.files.file : null;
-  const link = req.body.link;
   const author = req.body.author;
   const publisher = req.body.publisher;
   const descriptions = req.body.descriptions;
   const page = req.body.page;
   const categoryId = req.body.categoryId;
-  const host = "http://10.0.2.2:5000";
+  const host = "http://10.0.2.2:5005";
   const defaultCover = `${host}/images/defaultCover.jpg`;
 
   if (file) {
@@ -80,7 +79,6 @@ export const addBook = async (req, res) => {
           title: title,
           image: fileName,
           cover: cover,
-          link: link,
           author: author,
           publisher: publisher,
           descriptions: descriptions,
@@ -99,7 +97,6 @@ export const addBook = async (req, res) => {
         title: title,
         image: "defaultCover.jpg",
         cover: defaultCover,
-        link: link,
         author: author,
         publisher: publisher,
         descriptions: descriptions,

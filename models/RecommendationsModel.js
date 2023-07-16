@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
+import Books from "./BooksModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -31,5 +32,7 @@ const Recommendations = db.define(
     freezeTableName: true,
   }
 );
+
+Recommendations.belongsTo(Books, { foreignKey: "bookId" });
 
 export default Recommendations;
