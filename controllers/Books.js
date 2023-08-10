@@ -1,4 +1,5 @@
 import Books from "../models/BooksModel.js";
+import BookCategory from "../models/BookCategoryModel.js";
 import { Op } from "sequelize";
 import path from "path";
 import fs from "fs";
@@ -20,9 +21,34 @@ export const searchBooks = async (req, res) => {
         },
       ],
     },
+    include: [
+      {
+        model: BookCategory,
+        as: "category",
+        attributes: ["id", "category"],
+      },
+    ],
   });
+
+  const formattedResult = result.map((book) => {
+    return {
+      id: book.id,
+      image: book.image,
+      cover: book.cover,
+      title: book.title,
+      author: book.author,
+      publisher: book.publisher,
+      descriptions: book.descriptions,
+      page: book.page,
+      updatedAt: book.updatedAt,
+      categoryId: book.category.id,
+      categoryName: book.category.category,
+      createdAt: book.createdAt,
+    };
+  });
+
   res.json({
-    result: result,
+    result: formattedResult,
   });
 };
 
@@ -36,18 +62,18 @@ export const getTotalBooks = async (req, res) => {
   }
 };
 
-export const getProductById = async (req, res) => {
-  try {
-    const response = await Product.findOne({
-      where: {
-        id: req.params.id,
-      },
-    });
-    res.json(response);
-  } catch (error) {
-    console.log(error.message);
-  }
-};
+// export const getProductById = async (req, res) => {
+//   try {
+//     const response = await Product.findOne({
+//       where: {
+//         id: req.params.id,
+//       },
+//     });
+//     res.json(response);
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// };
 
 export const addBook = async (req, res) => {
   const title = req.body.title;
@@ -111,6 +137,74 @@ export const addBook = async (req, res) => {
   }
 };
 
+export const updateBook = async (req, res) => {
+  const bookId = req.params.bookId;
+  const title = req.body.title;
+  const file = req.files ? req.files.file : null;
+  const author = req.body.author;
+  const publisher = req.body.publisher;
+  const descriptions = req.body.descriptions;
+  const page = req.body.page;
+  const categoryId = req.body.categoryId;
+  const host = "http://10.0.2.2:5005";
+
+  try {
+    let book = await Books.findByPk(bookId);
+    if (!book) {
+      return res.status(404).json({ msg: "Buku tidak ditemukan" });
+    }
+
+    if (file) {
+      const fileSize = file.data.length;
+      const ext = path.extname(file.name);
+      const fileName = file.md5 + ext;
+      const allowedType = [".png", ".jpg", ".jpeg"];
+      const cover = `${host}/images/${fileName}`;
+
+      if (!allowedType.includes(ext.toLowerCase())) {
+        return res.status(422).json({ msg: "Invalid Images" });
+      }
+
+      if (fileSize > 5000000) {
+        return res.status(422).json({ msg: "Image must be less than 5 MB" });
+      }
+
+      file.mv(`./public/images/${fileName}`, async (err) => {
+        if (err) return res.status(500).json({ msg: err.message });
+        try {
+          await book.update({
+            title: title,
+            image: fileName,
+            cover: cover,
+            author: author,
+            publisher: publisher,
+            descriptions: descriptions,
+            page: page,
+            categoryId: categoryId,
+          });
+          res.json({ msg: "Buku berhasil diupdate" });
+        } catch (error) {
+          console.log(error.message);
+          res.status(500).json({ msg: "Server Error" });
+        }
+      });
+    } else {
+      await book.update({
+        title: title,
+        author: author,
+        publisher: publisher,
+        descriptions: descriptions,
+        page: page,
+        categoryId: categoryId,
+      });
+      res.json({ msg: "Buku berhasil diupdate" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
+
 export const deleteBook = async (req, res) => {
   try {
     const bookId = req.params.bookId;
@@ -119,7 +213,7 @@ export const deleteBook = async (req, res) => {
       return res.status(404).json({ msg: "Buku tidak ditemukan" });
     }
     await user.destroy();
-    res.json({ msg: "Akun berhasil dihapus" });
+    res.json({ msg: "Buku berhasil dihapus" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: "Server Error" });

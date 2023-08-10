@@ -18,9 +18,6 @@ const Users = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    profilePic: {
-      type: DataTypes.STRING,
-    },
     refresh_token: {
       type: DataTypes.TEXT,
     },

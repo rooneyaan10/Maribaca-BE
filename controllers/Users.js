@@ -40,15 +40,19 @@ export const searchUsers = async (req, res) => {
 
 export const Register = async (req, res) => {
   const { username, email, password, confPassword, role } = req.body;
-  // Memeriksa apakah username sudah ada dalam database
   const existingUser = await Users.findOne({ where: { username: username } });
   if (existingUser) {
     return res.status(400).json({ msg: "Username sudah digunakan" });
   }
-  // Memeriksa apakah email sudah ada dalam database
   const existingEmail = await Users.findOne({ where: { email: email } });
   if (existingEmail) {
     return res.status(400).json({ msg: "Email sudah digunakan" });
+  }
+
+  if (password.length < 8) {
+    return res
+      .status(400)
+      .json({ msg: "Password harus terdiri dari minimal 8 karakter" });
   }
 
   if (password !== confPassword)

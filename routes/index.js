@@ -15,6 +15,7 @@ import {
   searchBooks,
   getTotalBooks,
   addBook,
+  updateBook,
   deleteBook,
 } from "../controllers/Books.js";
 import {
@@ -45,6 +46,7 @@ router.put("/users/:userId/books/:bookId/updatepage", verifyToken, updatePage);
 router.put("/users/:userId/updateuser", updateUser);
 router.get("/users/:userId/total-read-books", verifyToken, getTotalReadBooks);
 router.delete("/users/:userId/deleteaccount", deleteAccount);
+router.patch("/books/:bookId", updateBook);
 router.delete("/books/:bookId/deletebook", deleteBook);
 router.get("/users/:userId/recommendations", verifyToken, getRecommendations);
 

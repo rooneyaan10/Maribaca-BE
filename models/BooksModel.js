@@ -1,11 +1,12 @@
-import { Sequelize } from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
 import db from "../config/Database.js";
 import BookCategory from "./BookCategoryModel.js";
 
-const { DataTypes } = Sequelize;
+const { Model } = Sequelize;
 
-const Books = db.define(
-  "books",
+class Books extends Model {}
+
+Books.init(
   {
     image: {
       type: DataTypes.STRING,
@@ -46,11 +47,13 @@ const Books = db.define(
     },
   },
   {
+    sequelize: db,
+    modelName: "books",
     freezeTableName: true,
     timestamps: true,
   }
 );
 
-Books.belongsTo(BookCategory, { foreignKey: "categoryId" });
+Books.belongsTo(BookCategory, { foreignKey: "categoryId", as: "category" });
 
 export default Books;

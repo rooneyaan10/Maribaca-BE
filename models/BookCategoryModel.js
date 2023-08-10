@@ -1,10 +1,11 @@
-import { Sequelize } from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
 import db from "../config/Database.js";
 
-const { DataTypes } = Sequelize;
+const { Model } = Sequelize;
 
-const BookCategory = db.define(
-  "book_category",
+class BookCategory extends Model {}
+
+BookCategory.init(
   {
     category: {
       type: DataTypes.STRING,
@@ -12,6 +13,8 @@ const BookCategory = db.define(
     },
   },
   {
+    sequelize: db,
+    modelName: "book_category",
     freezeTableName: true,
   }
 );
