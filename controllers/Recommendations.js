@@ -11,7 +11,15 @@ export const getRecommendations = async (req, res) => {
       include: [
         {
           model: Books,
-          attributes: ["id", "title", "author", "cover", "page"],
+          attributes: [
+            "id",
+            "title",
+            "author",
+            "cover",
+            "page",
+            "descriptions",
+            "publisher",
+          ],
         },
       ],
       attributes: ["bookId"],
