@@ -27,7 +27,7 @@ export const getCurrentlyRead = async (req, res) => {
 
 export const getDoneRead = async (req, res) => {
   try {
-    const userId = req.params.userId; // Ambil user ID dari parameter URL
+    const userId = req.params.userId;
     const readData = await ReadData.findAll({
       where: {
         userId: userId,
@@ -72,6 +72,20 @@ export const startRead = async (req, res) => {
     const bookId = req.params.bookId;
     const { target } = req.body;
 
+    // Cek apakah buku sudah ada dalam data baca pengguna
+    const existingReadData = await ReadData.findOne({
+      where: {
+        userId: userId,
+        bookId: bookId,
+      },
+    });
+
+    if (existingReadData) {
+      return res
+        .status(400)
+        .json({ msg: "Buku sudah ada dalam data baca pengguna" });
+    }
+
     const currentDate = new Date();
     const targetReadingDate = new Date(target);
     targetReadingDate.setHours(currentDate.getHours());
@@ -88,10 +102,10 @@ export const startRead = async (req, res) => {
       bookId: bookId,
     });
 
-    res.json({ msg: "berhasil menambah data" });
+    res.json({ msg: "Berhasil menambah data" });
   } catch (error) {
     console.log(error);
-    res.json({ msg: "gagal" });
+    res.json({ msg: "Gagal" });
   }
 };
 

@@ -2,6 +2,7 @@ import Books from "../models/BooksModel.js";
 import BookCategory from "../models/BookCategoryModel.js";
 import { Op } from "sequelize";
 import path from "path";
+import { API } from "../utils/const.js";
 import fs from "fs";
 
 export const searchBooks = async (req, res) => {
@@ -62,19 +63,6 @@ export const getTotalBooks = async (req, res) => {
   }
 };
 
-// export const getProductById = async (req, res) => {
-//   try {
-//     const response = await Product.findOne({
-//       where: {
-//         id: req.params.id,
-//       },
-//     });
-//     res.json(response);
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// };
-
 export const addBook = async (req, res) => {
   const title = req.body.title;
   const file = req.files ? req.files.file : null;
@@ -83,8 +71,7 @@ export const addBook = async (req, res) => {
   const descriptions = req.body.descriptions;
   const page = req.body.page;
   const categoryId = req.body.categoryId;
-  const host = "http://10.0.2.2:5005";
-  const defaultCover = `${host}/images/defaultCover.jpg`;
+  const defaultCover = `${API}/images/defaultCover.jpg`;
 
   if (file) {
     const fileSize = file.data.length;

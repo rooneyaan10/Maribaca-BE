@@ -197,22 +197,11 @@ export const Logout = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const {
-      profilePic,
-      username,
-      email,
-      currentPassword,
-      newPassword,
-      confirmNewPassword,
-    } = req.body;
+    const { username, email, password, confirmPassword } = req.body;
 
     const user = await Users.findByPk(userId);
     if (!user) {
       return res.status(404).json({ msg: "User tidak ditemukan" });
-    }
-
-    if (profilePic) {
-      await user.update({ profilePic });
     }
 
     if (username) {
@@ -223,20 +212,15 @@ export const updateUser = async (req, res) => {
       await user.update({ email });
     }
 
-    if (currentPassword && newPassword && confirmNewPassword) {
-      const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ msg: "Password saat ini salah" });
-      }
-
-      if (newPassword !== confirmNewPassword) {
+    if (password && confirmPassword) {
+      if (password !== confirmPassword) {
         return res
           .status(400)
           .json({ msg: "Password baru dan konfirmasi tidak cocok" });
       }
 
       const salt = await bcrypt.genSalt();
-      const hashPassword = await bcrypt.hash(newPassword, salt);
+      const hashPassword = await bcrypt.hash(password, salt);
 
       await user.update({ password: hashPassword });
     }
