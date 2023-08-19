@@ -78,7 +78,7 @@ export const addBook = async (req, res) => {
     const ext = path.extname(file.name);
     const fileName = file.md5 + ext;
     const allowedType = [".png", ".jpg", ".jpeg"];
-    const cover = `${host}/images/${fileName}`;
+    const cover = `${API}/images/${fileName}`;
 
     if (!allowedType.includes(ext.toLowerCase()))
       return res.status(422).json({ msg: "Invalid Images" });
@@ -133,7 +133,6 @@ export const updateBook = async (req, res) => {
   const descriptions = req.body.descriptions;
   const page = req.body.page;
   const categoryId = req.body.categoryId;
-  const host = "http://10.0.2.2:5005";
 
   try {
     let book = await Books.findByPk(bookId);
@@ -146,7 +145,7 @@ export const updateBook = async (req, res) => {
       const ext = path.extname(file.name);
       const fileName = file.md5 + ext;
       const allowedType = [".png", ".jpg", ".jpeg"];
-      const cover = `${host}/images/${fileName}`;
+      const cover = `${API}/images/${fileName}`;
 
       if (!allowedType.includes(ext.toLowerCase())) {
         return res.status(422).json({ msg: "Invalid Images" });
@@ -155,6 +154,9 @@ export const updateBook = async (req, res) => {
       if (fileSize > 5000000) {
         return res.status(422).json({ msg: "Image must be less than 5 MB" });
       }
+
+      const filepath = `./public/images/${book.image}`;
+      fs.unlinkSync(filepath);
 
       file.mv(`./public/images/${fileName}`, async (err) => {
         if (err) return res.status(500).json({ msg: err.message });
@@ -195,11 +197,13 @@ export const updateBook = async (req, res) => {
 export const deleteBook = async (req, res) => {
   try {
     const bookId = req.params.bookId;
-    const user = await Books.findByPk(bookId);
-    if (!user) {
+    const book = await Books.findByPk(bookId);
+    const filepath = `./public/images/${book.image}`;
+    fs.unlinkSync(filepath);
+    if (!book) {
       return res.status(404).json({ msg: "Buku tidak ditemukan" });
     }
-    await user.destroy();
+    await book.destroy();
     res.json({ msg: "Buku berhasil dihapus" });
   } catch (error) {
     console.log(error);
